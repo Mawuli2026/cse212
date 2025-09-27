@@ -8,10 +8,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 public class TakingTurnsQueueTests
 {
     [TestMethod]
-    // Scenario: Create a queue with the following people and turns: Bob (2), Tim (5), Sue (3) and
-    // run until the queue is empty
+    // Scenario: Create a queue with Bob (2), Tim (5), Sue (3) → run until empty.
     // Expected Result: Bob, Tim, Sue, Bob, Tim, Sue, Tim, Sue, Tim, Tim
-    // Defect(s) Found: 
+    // Defect(s) Found: Players with finite turns were not re-enqueued correctly.
     public void TestTakingTurnsQueue_FiniteRepetition()
     {
         var bob = new Person("Bob", 2);
@@ -40,10 +39,9 @@ public class TakingTurnsQueueTests
     }
 
     [TestMethod]
-    // Scenario: Create a queue with the following people and turns: Bob (2), Tim (5), Sue (3)
-    // After running 5 times, add George with 3 turns.  Run until the queue is empty.
+    // Scenario: Bob (2), Tim (5), Sue (3). After 5 rounds, add George (3).
     // Expected Result: Bob, Tim, Sue, Bob, Tim, Sue, Tim, George, Sue, Tim, George, Tim, George
-    // Defect(s) Found: 
+    // Defect(s) Found: Midway additions were not processed correctly.
     public void TestTakingTurnsQueue_AddPlayerMidway()
     {
         var bob = new Person("Bob", 2);
@@ -76,16 +74,14 @@ public class TakingTurnsQueueTests
 
             var person = players.GetNextPerson();
             Assert.AreEqual(expectedResult[i].Name, person.Name);
-
             i++;
         }
     }
 
     [TestMethod]
-    // Scenario: Create a queue with the following people and turns: Bob (2), Tim (Forever), Sue (3)
-    // Run 10 times.
+    // Scenario: Bob (2), Tim (Forever = 0), Sue (3). Run 10 rounds.
     // Expected Result: Bob, Tim, Sue, Bob, Tim, Sue, Tim, Sue, Tim, Tim
-    // Defect(s) Found: 
+    // Defect(s) Found: Infinite players (0 turns) had their turns decremented incorrectly.
     public void TestTakingTurnsQueue_ForeverZero()
     {
         var timTurns = 0;
@@ -109,14 +105,14 @@ public class TakingTurnsQueueTests
 
         // Verify that the people with infinite turns really do have infinite turns.
         var infinitePerson = players.GetNextPerson();
-        Assert.AreEqual(timTurns, infinitePerson.Turns, "People with infinite turns should not have their turns parameter modified to a very big number. A very big number is not infinite.");
+        Assert.AreEqual(timTurns, infinitePerson.Turns,
+            "People with infinite turns should not have their turns parameter modified to a very big number. A very big number is not infinite.");
     }
 
     [TestMethod]
-    // Scenario: Create a queue with the following people and turns: Tim (Forever), Sue (3)
-    // Run 10 times.
+    // Scenario: Tim (Forever = -3), Sue (3). Run 10 rounds.
     // Expected Result: Tim, Sue, Tim, Sue, Tim, Sue, Tim, Tim, Tim, Tim
-    // Defect(s) Found: 
+    // Defect(s) Found: Negative-turn players were not treated as infinite.
     public void TestTakingTurnsQueue_ForeverNegative()
     {
         var timTurns = -3;
@@ -137,13 +133,14 @@ public class TakingTurnsQueueTests
 
         // Verify that the people with infinite turns really do have infinite turns.
         var infinitePerson = players.GetNextPerson();
-        Assert.AreEqual(timTurns, infinitePerson.Turns, "People with infinite turns should not have their turns parameter modified to a very big number. A very big number is not infinite.");
+        Assert.AreEqual(timTurns, infinitePerson.Turns,
+            "People with infinite turns should not have their turns parameter modified to a very big number. A very big number is not infinite.");
     }
 
     [TestMethod]
-    // Scenario: Try to get the next person from an empty queue
-    // Expected Result: Exception should be thrown with appropriate error message.
-    // Defect(s) Found: 
+    // Scenario: Call GetNextPerson on empty queue.
+    // Expected Result: InvalidOperationException("No one in the queue.")
+    // Defect(s) Found: Exception handling missing/wrong.
     public void TestTakingTurnsQueue_Empty()
     {
         var players = new TakingTurnsQueue();
