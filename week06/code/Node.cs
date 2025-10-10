@@ -9,9 +9,14 @@ public class Node
         this.Data = data;
     }
 
+    /// <summary>
+    /// Problem 1: Insert unique values only
+    /// </summary>
     public void Insert(int value)
     {
-        // TODO Start Problem 1
+        // Skip duplicates (no duplicate nodes in BST)
+        if (value == Data)
+            return;
 
         if (value < Data)
         {
@@ -21,7 +26,7 @@ public class Node
             else
                 Left.Insert(value);
         }
-        else
+        else // value > Data
         {
             // Insert to the right
             if (Right is null)
@@ -31,15 +36,28 @@ public class Node
         }
     }
 
+    /// <summary>
+    /// Problem 2: Check if a value exists in the tree
+    /// </summary>
     public bool Contains(int value)
     {
-        // TODO Start Problem 2
-        return false;
+        if (value == Data)
+            return true;
+        else if (value < Data && Left is not null)
+            return Left.Contains(value);
+        else if (value > Data && Right is not null)
+            return Right.Contains(value);
+        else
+            return false;
     }
 
+    /// <summary>
+    /// Problem 4: Compute the height of the tree
+    /// </summary>
     public int GetHeight()
     {
-        // TODO Start Problem 4
-        return 0; // Replace this line with the correct return statement(s)
+        int leftHeight = Left?.GetHeight() ?? 0;
+        int rightHeight = Right?.GetHeight() ?? 0;
+        return 1 + Math.Max(leftHeight, rightHeight);
     }
 }
